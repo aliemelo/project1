@@ -4,7 +4,6 @@ import pickle
 def search(fasta, start, end, gene_name):
     index = pickle.load(open(fasta + '.fai', "rb"))
 
-    seq = ''
 
     with open(fasta, 'r') as f:
         for line_num, line in enumerate(f, 1):
@@ -21,27 +20,27 @@ def search(fasta, start, end, gene_name):
                     #start and end on the same line
                     if end <= index[gene_name][line_num][1]:
                         end_pos = end + index[gene_name][line_num][0] -1
-                        seq = line[start_pos:end_pos]
+                        yield line[start_pos:end_pos]
                         break
 
                     # starts in this line but ends in another line
                     elif end > (index[gene_name][line_num][1]):
-                        seq = line[start_pos:]
+                        yield line[start_pos:]
+
 
                 # The start was in another line and the end might be or not in this line (:. len(seq) >0)
                 if start < index[gene_name][line_num][0]:
 
                     # seq extends beyond this line
                     if end > index[gene_name][line_num][1]:
-                        seq += line[:]
+                        yield line[:]
+
 
                     # seq ends in this line
                     elif end<= index[gene_name][line_num][1]:
                         end_pos = end - index[gene_name][line_num][0]
-                        seq += line[:end_pos]
+                        yield line[:end_pos]
                         break
-
-    yield seq
 
 
 def len(fasta, gene_name=None):
@@ -64,5 +63,8 @@ def splice(fasta, ranges, gene_name):
         start,end = range.split("-")
         start = int(start)
         end = int(end)
+        seq = search(fasta, start, end, gene_name)
 
-        print(next(search(fasta, start, end, gene_name)))
+        for line in seq:
+            print(line)
+            print

@@ -76,9 +76,8 @@ def main():
         seq = search_fasta.search(fasta, start, end, gene_name)
 
         print('>{gene}:{start}-{end}'.format(gene=gene_name,start=start,end=end))
-        # print(seq)
-        print(next(seq))
-        print()
+        for line in seq:
+            print(line)
 
 
     if hasattr(args, 'len') and args.len:   # arg.len is True
@@ -93,7 +92,6 @@ def main():
 
         print('>{gene}:{range_list}'.format(gene=gene_name,range_list=ranges))
         search_fasta.splice(fasta, ranges, gene_name)
-
 
 
 if __name__ == '__main__':
